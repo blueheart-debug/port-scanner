@@ -4,42 +4,42 @@ import socket
 import sys
 from datetime import datetime
 
+# Validate input
+if len(sys.argv) != 2:
+    print('Invalid input! You must enter the hostname.\nUsage: python scan.py <hostname>')
+    sys.exit()
 
-if len(sys.argv) == 2:
-     theip = socket.gethostbyname(sys.argv[1])
-else :
-     print('invalid or you have forgot to enter the hostname')
-     print ('please enter file_name host_name')
+
+try:
+    theip = socket.gethostbyname(sys.argv[1])
+except socket.gaierror:
+    print('Hostname doesn’t exist or couldn’t be resolved.')
+    sys.exit()
 
 
 print('-' * 50)
-print(' scanning the device '+theip)
-print('time started \n' +str(datetime.now()))
-print('-' * 50)   
+print(f'Scanning the device: {theip}')
+print(f'Time started: {datetime.now()}')
+print('-' * 50)
+
+# Set timeout once
+socket.setdefaulttimeout(1)
 
 try:
-     for port in range(50,85):
-         s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-         socket.setdefaulttimeout(1)
-         result = s.connect_ex((theip,port))
-        # print('we re currently checking port {}'.format(port))
-         if result==0 :
-           print ('port {} is open'.format(port))
-         else:
-           print('port number {} is not open oups'.format(port))
-        
- 
-         s.close()
-         
-         
-     
+    for port in range(50, 85):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = s.connect_ex((theip, port))
+
+        if result == 0:
+            print(f'Port {port} is open')
+        else:
+            print(f'Port {port} is closed')
+
+        s.close()
+
 except KeyboardInterrupt:
-       print('\n exiting the program \n oups bye !')
-       sys.exit()
-except socket.giaerror:
-       print('hostname doesnt exist or couldnt be detected')
-       sys.exit()
+    print('\nExiting the program... Goodbye!')
+    sys.exit()
 except socket.error:
-       print('we cant reach the server')
-       sys.exit()
-       
+    print('Network error: Unable to reach the server.')
+    sys.exit()
